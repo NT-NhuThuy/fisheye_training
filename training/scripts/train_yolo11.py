@@ -12,7 +12,7 @@ os.makedirs(project_dir, exist_ok=True)
 
 # 3. Tiến hành Training
 model.train(
-    data="/AIClub_NAS/core_baotg/thuyntn/PlugIR/data_fisheye/dataset.yaml",
+    data="/kaggle/input/datasets/nguynthnhthy/data-root/data_fisheye/dataset.yaml",
     epochs=100,
     imgsz=960,             # Kích thước ảnh đầu vào. Ảnh 960 sẽ nét hơn 640 rất nhiều nhưng tốn RAM hơn
     batch=8,               # Giảm batch size xuống 8 để tránh lỗi CUBLAS/OOM khi dùng bản Medium ở 960px

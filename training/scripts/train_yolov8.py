@@ -13,7 +13,7 @@ os.makedirs(project_dir, exist_ok=True)
 
 # 3. Tiến hành Training
 model.train(
-    data="/AIClub_NAS/core_baotg/thuyntn/Datasets/CV/data_fisheye/dataset.yaml",
+    data="/kaggle/input/datasets/nguynthnhthy/data-root/data_fisheye/dataset.yaml",
     epochs=100,
     imgsz=960,             
     batch=16,              
