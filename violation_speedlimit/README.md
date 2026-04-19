@@ -1,19 +1,19 @@
 # Traffic Speed Violation Detection
 
-He thong phat hien vi pham toc do tu video fisheye, su dung YOLO va ByteTrack.
+This module detects traffic speed violations from fisheye camera videos using YOLO and ByteTrack.
 
-## Cai dat
+## Installation
 ```bash
 cd fisheye_training
 pip install -r requirements/inference.txt
 ```
 
-## Chay co ban
+## Basic Usage
 ```bash
 python violation_speedlimit/src/main.py --source path/to/video.mp4
 ```
 
-## Cau truc
+## Structure
 ```text
 violation_speedlimit/
 ├─ configs/

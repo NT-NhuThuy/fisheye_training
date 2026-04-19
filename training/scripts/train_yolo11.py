@@ -1,41 +1,31 @@
 import os
 from pathlib import Path
-
 from ultralytics import YOLO
 
+# 1. Tải mô hình YOLO11 Medium
+model = YOLO("../yolo11n.pt")  # Nằm trong PlugIR_Workspace
 
-TRAIN_ROOT = Path(__file__).resolve().parents[1]
-DATA_CONFIG_PATH = TRAIN_ROOT / "configs" / "dataset_balanced.yaml"
-if not DATA_CONFIG_PATH.exists():
-    DATA_CONFIG_PATH = TRAIN_ROOT / "configs" / "dataset.example.yaml"
-
-DATA_CONFIG = str(DATA_CONFIG_PATH)
-TRAIN_DEVICE = os.getenv("YOLO_DEVICE")
-MODEL_PATH = os.getenv("YOLO_MODEL_PATH", "../yolo11m.pt")
-
-model = YOLO(MODEL_PATH)
-
+# 2. Định nghĩa thư mục lưu
 project_dir = "../result_train_fisheye"
-run_name = "run_yolo11"
+run_name = "run_yolo11_final"
 os.makedirs(project_dir, exist_ok=True)
 
-train_kwargs = dict(
-    data=DATA_CONFIG,
+# 3. Tiến hành Training
+model.train(
+    data="/AIClub_NAS/core_baotg/thuyntn/PlugIR/data_fisheye/dataset.yaml",
     epochs=100,
-    imgsz=960,
-    batch=16,
+    imgsz=960,             # Kích thước ảnh đầu vào. Ảnh 960 sẽ nét hơn 640 rất nhiều nhưng tốn RAM hơn
+    batch=8,               # Giảm batch size xuống 8 để tránh lỗi CUBLAS/OOM khi dùng bản Medium ở 960px
+    device=0,              # Chuyển sang GPU 0 (đang trống) thay vì GPU 5 (đã có process khác)
     project=project_dir,
     name=run_name,
     patience=30,
     workers=8,
-    mosaic=1.0,
-    mixup=0.1,
-    degrees=10.0,
-    scale=0.5,
-    fliplr=0.0,
+
+    # --- Các thông số Augmented Ảnh quan trọng ---
+    mosaic=1.0,  # Ghép 4 ảnh đặc trưng, rất tốt để tìm biển báo nhỏ lấp ló
+    mixup=0.0,   # Tắt mixup (trộn ảnh) giúp mô hình dễ học đặc trưng thô
+    degrees=10.0,# Giới hạn xoay nhẹ
+    scale=0.5,   # Phóng to/nhỏ tỉ lệ (rất quan trọng vì biển tốc độ có lúc xa lúc gần)
+    fliplr=0.0,  # Tắt lật chiều dọc (tránh nhầm hướng mũi tên/hướng đường)
 )
-
-if TRAIN_DEVICE:
-    train_kwargs["device"] = TRAIN_DEVICE
-
-model.train(**train_kwargs)

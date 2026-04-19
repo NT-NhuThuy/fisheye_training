@@ -1,41 +1,32 @@
 import os
 from pathlib import Path
-
 from ultralytics import YOLO
 
+# 1. Tải mô hình biến thể YOLOv8
+# Cột mốc Nano (n) nhỏ nhẹ nhất, nếu có sẵn `yolov8n.pt` nó tải về. Dùng `yolov8m.pt` (Medium) sẽ khá nặng
+model = YOLO("yolov8n.pt") 
 
-TRAIN_ROOT = Path(__file__).resolve().parents[1]
-DATA_CONFIG_PATH = TRAIN_ROOT / "configs" / "dataset_balanced.yaml"
-if not DATA_CONFIG_PATH.exists():
-    DATA_CONFIG_PATH = TRAIN_ROOT / "configs" / "dataset.example.yaml"
-
-DATA_CONFIG = str(DATA_CONFIG_PATH)
-TRAIN_DEVICE = os.getenv("YOLO_DEVICE")
-MODEL_PATH = os.getenv("YOLO_MODEL_PATH", "yolov8n.pt")
-
-model = YOLO(MODEL_PATH)
-
+# 2. Định nghĩa thư mục lưu
 project_dir = "../result_train_fisheye"
 run_name = "run_yolov8"
 os.makedirs(project_dir, exist_ok=True)
 
-train_kwargs = dict(
-    data=DATA_CONFIG,
+# 3. Tiến hành Training
+model.train(
+    data="/AIClub_NAS/core_baotg/thuyntn/Datasets/CV/data_fisheye/dataset.yaml",
     epochs=100,
-    imgsz=960,
-    batch=16,
+    imgsz=960,             
+    batch=16,              
+    device=0,
     project=project_dir,
     name=run_name,
     patience=30,
     workers=8,
-    mosaic=1.0,
-    mixup=0.1,
+
+    # --- Các thông số Augmented Ảnh quan trọng ---
+    mosaic=1.0,  
+    mixup=0.0,   
     degrees=10.0,
-    scale=0.5,
-    fliplr=0.0,
+    scale=0.5,   
+    fliplr=0.0,  
 )
-
-if TRAIN_DEVICE:
-    train_kwargs["device"] = TRAIN_DEVICE
-
-model.train(**train_kwargs)
